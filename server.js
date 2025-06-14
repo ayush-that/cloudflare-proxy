@@ -14,10 +14,16 @@ app.use("*", async (req, res) => {
     return res.status(400).json({ error: "Missing url parameter" });
   }
 
-  const headers = { ...req.headers };
-  delete headers.host;
-
-  headers["x-api-key"] = "a7f3c8d9e0b2f45a6c1d7e9b34f0a8cd";
+  const headers = {
+    "x-api-key": "a7f3c8d9e0b2f45a6c1d7e9b34f0a8cd",
+    "User-Agent":
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+    Accept: "text/tab-separated-values,*/*",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br",
+    Connection: "keep-alive",
+    "Upgrade-Insecure-Requests": "1",
+  };
 
   try {
     const response = await axios({
