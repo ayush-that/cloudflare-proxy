@@ -5,21 +5,42 @@ const axios = require("axios");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.get("/fetch-tsv", async (req, res) => {
-  const url = "https://payvn333.com/api/payouts/export-tsv";
-  const headers = {
-    "x-api-key": process.env.API_KEY,
-    "User-Agent": "Mozilla/5.0",
-    Accept: "text/tab-separated-values",
-  };
+app.use(express.json());
+
+app.use("*", async (req, res) => {
+  const targetUrl = req.query.url;
+
+  if (!targetUrl) {
+    return res.status(400).json({ error: "Missing url parameter" });
+  }
+
+  const headers = { ...req.headers };
+  delete headers.host;
+
+  if (process.env.API_KEY) {
+    headers["x-api-key"] = process.env.API_KEY;
+  }
 
   try {
-    const response = await axios.get(url, { headers });
-    res.setHeader("Content-Type", "text/tab-separated-values");
-    res.status(200).send(response.data);
+    const response = await axios({
+      method: req.method,
+      url: targetUrl,
+      headers,
+      data: req.body,
+      params: { ...req.query, url: undefined },
+    });
+
+    Object.keys(response.headers).forEach((key) => {
+      res.setHeader(key, response.headers[key]);
+    });
+
+    res.status(response.status).send(response.data);
   } catch (error) {
     console.error("Proxy error:", error.message);
-    res.status(500).json({ error: "Failed to fetch TSV from payvn333.com" });
+    res.status(error.response?.status || 500).json({
+      error: "Proxy request failed",
+      message: error.message,
+    });
   }
 });
 
