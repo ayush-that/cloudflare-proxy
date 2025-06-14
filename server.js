@@ -17,9 +17,7 @@ app.use("*", async (req, res) => {
   const headers = { ...req.headers };
   delete headers.host;
 
-  if (process.env.API_KEY) {
-    headers["x-api-key"] = process.env.API_KEY;
-  }
+  headers["x-api-key"] = "a7f3c8d9e0b2f45a6c1d7e9b34f0a8cd";
 
   try {
     const response = await axios({
